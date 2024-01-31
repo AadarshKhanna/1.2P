@@ -1,0 +1,42 @@
+// Pin assignments
+const int Pin = 3;      // Digital pin connected to the motion sensor
+const int ledPin = 13;   // LED pin used to indicate motion capture
+const int btn_pin = 2;   // Button pin for manual LED toggle
+
+// Variables
+uint8_t led_state = LOW;  // Current state of the LED
+uint8_t btn_prev = HIGH;  // Previous state of the button
+
+// Setup function, runs once when the microcontroller starts
+void setup() {
+  Serial.begin(9600);            // Initialize serial communication
+  pinMode(btn_pin, INPUT_PULLUP); // Set button pin as input with pull-up resistor
+  pinMode(Pin, INPUT);            // Set motion sensor pin as input
+  pinMode(ledPin, OUTPUT);        // Set LED pin as output
+  
+  // Attach interrupt to the button pin, trigger on falling edge, call toggle function
+  attachInterrupt(digitalPinToInterrupt(btn_pin), toggle, FALLING);
+}
+
+// Main loop function, runs repeatedly after setup
+void loop() {
+  // Read the motion sensor input
+  int Value = digitalRead(Pin);
+  
+  // Update system status based on motion sensor input
+  if (Value == HIGH) {
+    Serial.println("Motion has been Detected!");
+    digitalWrite(ledPin, HIGH);  // Turn on the LED
+  } else {
+    Serial.println("No Motion Detected.");
+    digitalWrite(ledPin, LOW);   // Turn off the LED
+  }
+
+  delay(1000); // Delay for 1 second
+}
+
+// Toggle function called when the button is pressed
+void toggle() {
+  led_state = !led_state;         // Toggle the LED state
+  digitalWrite(ledPin, led_state);// Update the LED state
+}
